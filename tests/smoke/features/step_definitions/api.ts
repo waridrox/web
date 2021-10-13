@@ -23,3 +23,12 @@ Given('admin set the default folder for received shares to {string}', async func
     await api.folder.setReceivedFolder({ folder: stepApp, admin })
   }
 })
+
+Given('admin disables auto accepting', async function(
+  this: World,
+): Promise<void> {
+  const admin = this.userContinent.get({ id: 'admin' })
+  if (!config.ocis) {
+    await api.folder.disablesAutoAccept({ admin })
+  }
+})

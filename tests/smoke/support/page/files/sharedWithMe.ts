@@ -10,7 +10,7 @@ export class SharedWithMePage {
 
   async navigate(): Promise<void> {
     const { page } = this.actor
-    await page.click('a[href="#/files/list/shared-with-me"]')
+    await (await page.waitForSelector('a[href="#/files/list/shared-with-me"]')).click()
   }
 
   async acceptShares({ name }: { name: string }): Promise<void> {
@@ -23,13 +23,27 @@ export class SharedWithMePage {
       name: name
     })
 
-    const statusResource = await page.textContent(
-      `//*[@data-test-resource-name="${name}"]/ancestor::tr//span[contains(@class, "file-row-share-status-text")]`
-    )
-
-    if (!objectExists && statusResource !== 'Accepted') {
-      await page.click(`//*[@data-test-resource-name="${name}"]/ancestor::tr//button[1]`)
+    if (!objectExists) {
+      await (await page.waitForSelector(`//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-success")]`)).click()
     }
     await page.goto(startUrl)
+    await page.reload()
+  }
+
+  async declineShares({ name }: { name: string }): Promise<void> {
+    const { page } = this.actor
+    const startUrl = page.url()
+
+    this.navigate()
+    const objectExists = await cta.files.resourceExists({
+      page: page,
+      name: name
+    })
+
+    if (!objectExists) {
+      await (await page.waitForSelector(`//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-passive-outline")]`)).click()
+    }
+    await page.goto(startUrl)
+    await page.reload()
   }
 }
