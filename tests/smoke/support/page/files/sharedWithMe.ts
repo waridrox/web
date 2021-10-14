@@ -24,7 +24,11 @@ export class SharedWithMePage {
     })
 
     if (!objectExists) {
-      await (await page.waitForSelector(`//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-success")]`)).click()
+      await (
+        await page.waitForSelector(
+          `//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-success")]`
+        )
+      ).click()
     }
     await page.goto(startUrl)
     await page.reload()
@@ -41,7 +45,11 @@ export class SharedWithMePage {
     })
 
     if (!objectExists) {
-      await (await page.waitForSelector(`//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-passive-outline")]`)).click()
+      await (
+        await page.waitForSelector(
+          `//*[@data-test-resource-name="${name}"]/ancestor::tr//button[contains(@class,"oc-button-passive-outline")]`
+        )
+      ).click()
     }
     await page.goto(startUrl)
     await page.reload()

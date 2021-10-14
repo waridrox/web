@@ -228,7 +228,7 @@ When('{string} creates new versions of the folowing file(s)', async function(
   }, {})
 
   for (const folder of Object.keys(uploadInfo)) {
-    await allFilesPage.uploadFiles({ folder, files: uploadInfo[folder], newVersion: true})
+    await allFilesPage.uploadFiles({ folder, files: uploadInfo[folder], newVersion: true })
   }
 })
 
@@ -260,26 +260,16 @@ Then('{string} checks whether the following resource(s) exist', async function(
   }
 })
 
-Then('{string} checks the number of versions of the file', async function(
+Then('{string} checks that new version exists', async function(
   this: World,
   stepUser: string,
   stepTable: DataTable
 ) {
   const actor = this.actorContinent.get({ id: stepUser })
   const { allFiles: allFilesPage } = new FilesPage({ actor })
-  const countInfo = stepTable.hashes().reduce((acc, stepRow) => {
-    const { count, resource } = stepRow
+  const resources = stepTable.raw().map(f => f[0])
 
-    if (!acc[resource]) {
-      acc[resource] = []
-    }
-
-    acc[resource].push(count)
-
-    return acc
-  }, {})
-
-  for (const folder of Object.keys(countInfo)) {
-    await allFilesPage.checkVersionCount({ folder, count: countInfo[folder] })
+  for (const resource of resources) {
+    await allFilesPage.versionExist({ resource: resource })
   }
 })
