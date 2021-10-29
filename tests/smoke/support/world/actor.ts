@@ -14,10 +14,7 @@ export class ActorContinent {
   }
 
   public async create({ id }: { id: string }): Promise<Actor> {
-    if (this.store.has(id)) {
-      throw new Error(`Actor '${id}' already exists.`)
-    }
-
+    
     const context = await browser.newContext({
       acceptDownloads: true,
       ignoreHTTPSErrors: true
