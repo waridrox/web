@@ -2,6 +2,7 @@ import { Download } from 'playwright'
 import { User, Actor, File } from '../../types'
 import { cta } from '../../cta'
 import path from 'path'
+import { config } from '../..'
 
 export class AllFilesPage {
   private readonly actor: Actor
@@ -24,7 +25,7 @@ export class AllFilesPage {
     for (const folderName of paths) {
       const folderExists = await cta.files.resourceExists({
         page: page,
-        name: folderName
+        name: folderName,
       })
 
       if (!folderExists) {
@@ -44,7 +45,7 @@ export class AllFilesPage {
   async uploadFiles({
     files,
     folder,
-    newVersion = false
+    newVersion = false,
   }: {
     files: File[]
     folder?: string
@@ -59,7 +60,7 @@ export class AllFilesPage {
     await page.click('#new-file-menu-btn')
     await page.setInputFiles(
       '#fileUploadInput',
-      files.map(file => file.path)
+      files.map((file) => file.path)
     )
 
     if (newVersion) {
@@ -68,7 +69,7 @@ export class AllFilesPage {
 
     await cta.files.waitForResources({
       page: page,
-      names: files.map(file => path.basename(file.name))
+      names: files.map((file) => path.basename(file.name)),
     })
 
     await page.goto(startUrl)
@@ -83,14 +84,13 @@ export class AllFilesPage {
     if (folder) {
       await cta.files.navigateToFolder({ page: page, path: folder })
     }
-
     for (const name of names) {
       await cta.files.sidebar.open({ page: page, resource: name })
       await cta.files.sidebar.openPanel({ page: page, name: 'actions' })
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click('.oc-files-actions-download-trigger')
+        page.click('.oc-files-actions-download-file-trigger'),
       ])
 
       await cta.files.sidebar.close({ page: page })
@@ -106,11 +106,13 @@ export class AllFilesPage {
   async shareFolder({
     folder,
     users,
-    role
+    role,
+    mainMenu = false,
   }: {
     folder: string
     users: User[]
     role: string
+    mainMenu?: boolean
   }): Promise<void> {
     const { page } = this.actor
     const startUrl = page.url()
@@ -120,9 +122,16 @@ export class AllFilesPage {
     if (folderPaths.length) {
       await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
     }
-
-    await cta.files.sidebar.open({ page: page, resource: folderName })
-    await cta.files.sidebar.openPanel({ page: page, name: 'sharing' })
+    if (mainMenu) {
+      await (
+        await page.waitForSelector(
+          `//*[@data-test-resource-name="${folderName}"]/ancestor::tr//button[contains(@class, "files-quick-action-collaborators")]`
+        )
+      ).click()
+    } else {
+      await cta.files.sidebar.open({ page: page, resource: folderName })
+      await cta.files.sidebar.openPanel({ page: page, name: 'sharing' })
+    }
     await page.click('.files-collaborators-open-add-share-dialog-button')
 
     for (const user of users) {
@@ -162,7 +171,7 @@ export class AllFilesPage {
   async moveOrCopyFiles({
     folder,
     moveTo,
-    action
+    action,
   }: {
     folder?: string
     moveTo: string
@@ -203,8 +212,8 @@ export class AllFilesPage {
     if (name) {
       await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
     }
-      
-    await page.waitForSelector(`//*[@data-test-resource-name="${resouceName}"]`) 
+
+    await page.waitForSelector(`//*[@data-test-resource-name="${resouceName}"]`)
     await page.goto(startUrl)
   }
 
@@ -219,10 +228,10 @@ export class AllFilesPage {
     }
     const resourseExists = await cta.files.resourceExists({
       page: page,
-      name: resouceName
+      name: resouceName,
     })
-    
-    if (resourseExists) throw new Error(`selector was find: "${resouceName}"`);
+
+    if (resourseExists) throw new Error(`selector was find: "${resouceName}"`)
     await page.goto(startUrl)
   }
 
@@ -248,19 +257,94 @@ export class AllFilesPage {
     const startUrl = page.url()
     const folderPaths = resource.split('/')
     const resouceName = folderPaths.pop()
-    
+
     if (folderPaths.length) {
       await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
     }
 
     const resourceCheckbox = `//*[@data-test-resource-name="${resouceName}"]//ancestor::tr//input`
-    
-    if (!await page.isChecked(resourceCheckbox)){
+
+    if (!(await page.isChecked(resourceCheckbox))) {
       await page.check(resourceCheckbox)
     }
     await (await page.waitForSelector('//*[@id="delete-selected-btn"]')).click()
     await (await page.waitForSelector('.oc-modal-body-actions-confirm')).click()
 
     await page.goto(startUrl)
+  }
+
+  async openInMediaviewer({ resource }: { resource: string }): Promise<void> {
+    const { page } = this.actor
+    const startUrl = page.url()
+    const folderPaths = resource.split('/')
+    const resouceName = folderPaths.pop()
+
+    if (folderPaths.length) {
+      await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
+    }
+
+    await cta.files.sidebar.open({ page: page, resource: resouceName })
+    await page.waitForSelector('.details-preview')
+    await cta.files.sidebar.openPanel({ page: page, name: 'actions' })
+    await (await page.waitForSelector('.oc-files-actions-mediaviewer-trigger')).click()
+
+    const expectedUrl = config.frontendUrl + `#/mediaviewer/files-personal/Shares/${resouceName}`
+    await page.waitForURL(expectedUrl)
+
+    await page.goto(startUrl)
+  }
+
+  async changeShareRole({
+    folder,
+    users,
+    role,
+  }: {
+    folder: string
+    users: User[]
+    role: string
+  }): Promise<void> {
+    const { page } = this.actor
+    const startUrl = page.url()
+    const folderPaths = folder.split('/')
+    const folderName = folderPaths.pop()
+
+    if (folderPaths.length) {
+      await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
+    }
+
+    await cta.files.sidebar.open({ page: page, resource: folderName })
+    await cta.files.sidebar.openPanel({ page: page, name: 'sharing' })
+
+    await (await page.waitForSelector('//*[@data-testid="collaborators-show-people"]')).click()
+
+    for (const user of users) {
+      await (
+        await page.waitForSelector(`//*[@data-testid="recipient-${user.id}-btn-edit"]`)
+      ).click()
+      await page.click('//*[@id="files-collaborators-role-button"]')
+      await page.click(`//*[@id="files-role-${role}"]`)
+      await page.click('//*[@data-testid="recipient-edit-btn-save"]')
+    }
+  }
+
+  async removeShares({ folder, users }: { folder: string; users: User[] }): Promise<void> {
+    const { page } = this.actor
+    const startUrl = page.url()
+    const folderPaths = folder.split('/')
+    const folderName = folderPaths.pop()
+
+    if (folderPaths.length) {
+      await cta.files.navigateToFolder({ page: page, path: folderPaths.join('/') })
+    }
+
+    await cta.files.sidebar.open({ page: page, resource: folderName })
+    await cta.files.sidebar.openPanel({ page: page, name: 'sharing' })
+
+    await (await page.waitForSelector('//*[@data-testid="collaborators-show-people"]')).click()
+
+    for (const user of users) {
+      const deleteButton = `//*[@data-testid="collaborator-item-${user.id}"]//button[contains(@class,"files-collaborators-collaborator-delete")]`
+      await (await page.waitForSelector(deleteButton)).click()
+    }
   }
 }
