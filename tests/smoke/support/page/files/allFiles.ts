@@ -80,6 +80,7 @@ export class AllFilesPage {
     const { page } = this.actor
     const startUrl = page.url()
     const downloads = []
+    // await page.pause()
 
     if (folder) {
       await cta.files.navigateToFolder({ page: page, path: folder })
@@ -91,7 +92,7 @@ export class AllFilesPage {
 
       const [download] = await Promise.all([
         page.waitForEvent('download'),
-        page.click('.oc-files-actions-download-file-trigger')
+        page.click('.sidebar-panel__body .oc-files-actions-download-file-trigger')
       ])
 
       await cta.files.sidebar.close({ page: page })
@@ -199,6 +200,7 @@ export class AllFilesPage {
     if (resourceDir) {
       await cta.files.navigateToFolder({ page: page, path: resourceDir })
     }
+    await page.pause()
 
     await page.click(`//*[@data-test-resource-name="${resourceBase}"]`, { button: 'right' })
     await page.click(`.oc-files-actions-${action}-trigger`)
@@ -208,7 +210,12 @@ export class AllFilesPage {
       await cta.files.navigateToFolder({ page: page, path: newLocation })
     }
 
-    await page.click('#location-picker-btn-confirm')
+    const url = 'http://host.docker.internal:8080/remote.php/webdav/Shares/folder_to_shared'
+    await Promise.all([      
+      page.waitForResponse((resp) => resp.url().endsWith(resourceBase) && resp.status() === 201),
+      page.click('#location-picker-btn-confirm')
+    ])
+    
     await cta.files.waitForResources({
       page: page,
       names: [resourceBase]

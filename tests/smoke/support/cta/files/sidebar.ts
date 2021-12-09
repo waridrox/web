@@ -20,13 +20,27 @@ export const openPanel = async ({
   name: 'actions' | 'sharing' | 'links' | 'versions' | 'details'
 }): Promise<void> => {
   await page.waitForSelector('//*[@id="sidebar-panel-details-item"]')
-  const backElement = await page.$('.sidebar-panel.is-active .header__back')
-  if (backElement) {
+  // const backElement = await page.$('.sidebar-panel.is-active .header__back')
+  // if (backElement) {
+  //   await backElement.click()
+  // }
+
+  try {
+    const backElement = await page.waitForSelector('.sidebar-panel.is-active .header__back', {timeout: 500})
     await backElement.click()
+  } catch (error) {
+    
   }
 
-  const panelOpenElement = await page.$(`#sidebar-panel-${name}-item-select`)
-  if (panelOpenElement) {
+  // const panelOpenElement = await page.$(`#sidebar-panel-${name}-item-select`)
+  // if (panelOpenElement) {
+  //   await panelOpenElement.click()
+  // }
+
+  try {
+    const panelOpenElement = await page.waitForSelector(`#sidebar-panel-${name}-item-select`, {timeout: 500})
     await panelOpenElement.click()
+  } catch (error) {
+    
   }
 }
