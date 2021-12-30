@@ -11,18 +11,11 @@
       <div v-else key="loaded-drop" class="uk-flex uk-flex-column uk-flex-middle uk-height-1-1">
         <div class="uk-text-center uk-width-1-1 uk-width-xxlarge@m">
           <h2 v-text="title" />
-          <vue-dropzone
-            id="oc-dropzone"
-            :options="dropzoneOptions"
-            :use-custom-slot="true"
-            :include-styling="false"
-            @vdropzone-file-added="dropZoneFileAdded"
-          >
-            <div class="uk-flex uk-flex-middle uk-flex-center uk-placeholder">
-              <oc-icon name="file_upload" />
-              <translate>Drop files here to upload or click to select file</translate>
-            </div>
-          </vue-dropzone>
+          <!-- needs uppy dropzone -->
+          <div class="uk-flex uk-flex-middle uk-flex-center uk-placeholder">
+            <oc-icon name="file_upload" />
+            <translate>Drop files here to upload or click to select file</translate>
+          </div>
           <div id="previews" hidden />
         </div>
         <div
@@ -74,15 +67,11 @@
 </template>
 
 <script>
-import vue2DropZone from 'vue2-dropzone'
 import { mapGetters } from 'vuex'
 import Mixins from '../mixins.js'
 import { DavProperties } from 'web-pkg/src/constants'
 
 export default {
-  components: {
-    vueDropzone: vue2DropZone
-  },
   mixins: [Mixins],
   data() {
     return {

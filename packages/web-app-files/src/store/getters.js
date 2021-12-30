@@ -36,9 +36,6 @@ export default {
       folders: folderCount
     }
   },
-  dropzone: (state) => {
-    return state.dropzone
-  },
   currentFileOutgoingCollaborators: (state) => {
     return state.currentFileOutgoingShares.filter((share) => {
       return ShareTypes.containsAnyValue(ShareTypes.authenticated, [share.shareType])

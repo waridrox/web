@@ -2,7 +2,6 @@ import 'vue-resize/dist/vue-resize.css'
 import Vue from 'vue'
 import MediaSource from '../plugins/mediaSource.js'
 import WebPlugin from '../plugins/web'
-import ChunkedUpload from '../plugins/upload'
 import Avatar from '../components/Avatar.vue'
 import focusMixin from '../mixins/focusMixin'
 import lifecycleMixin from '../mixins/lifecycleMixin'
@@ -30,7 +29,6 @@ Vue.use(VueResize)
 Vue.use(VueMeta, {
   refreshOnceOnNavigation: true
 })
-Vue.use(ChunkedUpload)
 Vue.use(Vue2TouchEvents)
 Vue.use(PortalVue)
 Vue.use(AsyncComputed)

@@ -10,17 +10,6 @@ import { has } from 'lodash-es'
 import { ShareTypes } from '../helpers/share'
 
 export default {
-  updateFileProgress({ commit }, progress) {
-    commit('UPDATE_FILE_PROGRESS', progress)
-  },
-  addFileToProgress({ commit }, file) {
-    commit('ADD_FILE_TO_PROGRESS', file)
-  },
-
-  removeFileFromProgress({ commit }, file) {
-    commit('REMOVE_FILE_FROM_PROGRESS', file)
-  },
-
   loadFiles(context, { currentFolder, files }) {
     if (currentFolder) {
       currentFolder = buildResource(currentFolder)
@@ -467,6 +456,7 @@ export default {
       .catch((e) => context.commit('CURRENT_FILE_OUTGOING_SHARES_ERROR', e.message))
   },
 
+  // pretty sure actions below are obsolete
   addActionToProgress({ commit }, item) {
     commit('ADD_ACTION_TO_PROGRESS', item)
   },
@@ -474,6 +464,8 @@ export default {
   removeActionFromProgress({ commit }, item) {
     commit('REMOVE_ACTION_FROM_PROGRESS', item)
   },
+
+  // pretty sure actions above are obsolete
 
   pushResourcesToDeleteList({ commit }, resources) {
     commit('PUSH_RESOURCES_TO_DELETE_LIST', resources)

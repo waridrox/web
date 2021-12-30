@@ -4,7 +4,6 @@ export default {
   filesSearched: null,
   selectedIds: [],
   inProgress: [],
-  dropzone: false,
   shareOpen: null,
   versions: [],
 

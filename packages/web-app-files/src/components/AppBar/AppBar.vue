@@ -1,15 +1,6 @@
 <template>
   <div class="files-app-bar">
     <oc-hidden-announcer :announcement="selectedResourcesAnnouncement" level="polite" />
-    <file-drop
-      v-if="!isIE11() && canUpload && hasFreeSpace"
-      :root-path="currentPath"
-      :path="currentPath"
-      :headers="headers"
-      @success="onFileSuccess"
-      @error="onFileError"
-      @progress="onFileProgress"
-    />
     <div class="files-topbar oc-py-s">
       <oc-breadcrumb
         v-if="showBreadcrumb"
@@ -32,6 +23,7 @@
           class="uk-flex-1 uk-flex uk-flex-start"
         >
           <template v-if="showActions && areDefaultActionsVisible">
+            <button-trigger />
             <oc-button
               id="new-file-menu-btn"
               key="new-file-menu-btn-enabled"
@@ -55,53 +47,29 @@
             >
               <ul class="uk-list">
                 <li>
-                  <file-upload
-                    :path="currentPath"
-                    :headers="headers"
-                    @success="onFileSuccess"
-                    @error="onFileError"
-                    @progress="onFileProgress"
-                  />
-                </li>
-                <li v-if="checkIfBrowserSupportsFolderUpload">
-                  <folder-upload
-                    v-if="!isIE11()"
-                    :root-path="currentPath"
-                    :path="currentPath"
-                    :headers="headers"
-                    @success="onFileSuccess"
-                    @error="onFileError"
-                    @progress="onFileProgress"
-                  />
-                </li>
-                <li>
-                  <div>
-                    <oc-button
-                      id="new-folder-btn"
-                      appearance="raw"
-                      class="uk-width-1-1"
-                      justify-content="left"
-                      @click="showCreateResourceModal"
-                    >
-                      <oc-icon name="create_new_folder" />
-                      <translate>New folder…</translate>
-                    </oc-button>
-                  </div>
+                  <oc-button
+                    id="new-folder-btn"
+                    appearance="raw"
+                    class="uk-width-1-1"
+                    justify-content="left"
+                    @click="showCreateResourceModal"
+                  >
+                    <oc-icon name="create_new_folder" />
+                    <translate>New folder…</translate>
+                  </oc-button>
                 </li>
                 <li v-for="(newFileHandler, key) in newFileHandlersForRoute" :key="key">
-                  <div>
-                    <oc-button
-                      appearance="raw"
-                      justify-content="left"
-                      :class="['new-file-btn-' + newFileHandler.ext, 'uk-width-1-1']"
-                      @click="
-                        showCreateResourceModal(false, newFileHandler.ext, newFileHandler.action)
-                      "
-                    >
-                      <oc-icon :name="newFileHandler.icon || 'save'" />
-                      <span>{{ newFileHandler.menuTitle($gettext) }}</span>
-                    </oc-button>
-                  </div>
+                  <oc-button
+                    appearance="raw"
+                    justify-content="left"
+                    :class="['new-file-btn-' + newFileHandler.ext, 'uk-width-1-1']"
+                    @click="
+                      showCreateResourceModal(false, newFileHandler.ext, newFileHandler.action)
+                    "
+                  >
+                    <oc-icon :name="newFileHandler.icon || 'save'" />
+                    <span>{{ newFileHandler.menuTitle($gettext) }}</span>
+                  </oc-button>
                 </li>
               </ul>
             </oc-drop>
@@ -129,22 +97,24 @@ import { buildResource } from '../../helpers/resources'
 import { bus } from 'web-pkg/src/instance'
 
 import BatchActions from './SelectedResources/BatchActions.vue'
-import FileDrop from './Upload/FileDrop.vue'
-import FileUpload from './Upload/FileUpload.vue'
-import FolderUpload from './Upload/FolderUpload.vue'
+import ButtonTrigger from './Upload/ButtonTrigger.vue'
 import SizeInfo from './SelectedResources/SizeInfo.vue'
 import ViewOptions from './ViewOptions.vue'
 import { DavProperties, DavProperty } from 'web-pkg/src/constants'
 import ContextActions from '../FilesList/ContextActions.vue'
 
+import Uppy from '@uppy/core'
+import Tus from '@uppy/tus'
+import XHRUpload from '@uppy/xhr-upload'
+import StatusBar from '@uppy/status-bar'
+import DropTarget from '@uppy/drop-target'
+
 export default {
   components: {
     BatchActions,
-    FileDrop,
-    FileUpload,
-    FolderUpload,
     SizeInfo,
     ViewOptions,
+    ButtonTrigger,
     ContextActions
   },
   mixins: [Mixins, MixinFileActions, MixinRoutes, MixinScrollToResource],
@@ -154,7 +124,14 @@ export default {
     fileFolderCreationLoading: false
   }),
   computed: {
-    ...mapGetters(['getToken', 'configuration', 'newFileHandlers', 'quota', 'user']),
+    ...mapGetters([
+      'getToken',
+      'configuration',
+      'capabilities',
+      'newFileHandlers',
+      'quota',
+      'user'
+    ]),
     ...mapGetters('Files', ['files', 'currentFolder', 'selectedFiles', 'publicLinkPassword']),
     ...mapState(['route']),
     ...mapState('Files', ['areHiddenFilesShown']),
@@ -319,14 +296,117 @@ export default {
       this.SET_HIDDEN_FILES_VISIBILITY(areHiddenFilesShownBoolean)
     }
   },
+  mounted() {
+    const chunkSize = this.configuration.uploadChunkSize
+    // if (this.currentFolder.isChunkedUploadSupported) {
+    //   let chunkSize = this.configuration.uploadChunkSize
+    //   if (this.capabilities.files.tus_support.max_chunk_size > 0) {
+    //     if (
+    //       chunkSize === null ||
+    //       chunkSize === 0 ||
+    //       chunkSize > this.capabilities.files.tus_support.max_chunk_size
+    //     ) {
+    //       chunkSize = this.capabilities.files.tus_support.max_chunk_size
+    //     }
+    //   }
+    // }
+
+    const client = this.$client
+    // todo: set debug to false
+    const uppy = new Uppy({ debug: true, autoProceed: true })
+    const uploadPath = client.files.getFileUrlV2(this.currentPath)
+    const headers = client.helpers.buildHeaders()
+
+    if (this.capabilities.files.tus_support) {
+      delete headers['OCS-APIREQUEST']
+      uppy.use(Tus, {
+        endpoint: uploadPath,
+        headers: headers,
+        chunkSize: chunkSize || Infinity,
+        removeFingerprintOnSuccess: true,
+        overridePatchMethod: !!this.capabilities.files.tus_support.http_method_override,
+        retryDelays: [0, 3000, 5000, 10000, 20000]
+      })
+    } else {
+      uppy.use(XHRUpload, {
+        endpoint: uploadPath,
+        method: 'put',
+        headers: headers
+      })
+    }
+
+    // upload button handling
+    const fileInput = document.querySelector('#my-file-input')
+
+    fileInput.addEventListener('change', (event) => {
+      const files = Array.from(event.target.files)
+
+      files.forEach((file) => {
+        try {
+          console.log('file', file)
+          uppy.addFile({
+            source: 'file input',
+            name: file.name,
+            type: file.type,
+            data: file
+          })
+        } catch (err) {
+          if (err.isRestriction) {
+            // handle restrictions
+            console.log('Restriction error:', err)
+          } else {
+            // handle other errors
+            console.error(err)
+          }
+        }
+      })
+    })
+
+    // upload via drag&drop handling
+    uppy.use(DropTarget, {
+      target: '.files-list-wrapper'
+    })
+
+    uppy.on('upload-error', (file, error, response) => {
+      console.log('error with file:', file.id)
+      console.log('error message:', error)
+      this.onFileError(error.toString())
+    })
+
+    uppy.on('file-removed', () => {
+      fileInput.value = ''
+    })
+
+    uppy.on('complete', (result) => {
+      result.successful.forEach((file) => {
+        console.log(file, file.data)
+        this.onFileSuccess(file.data)
+      })
+      fileInput.value = ''
+      console.log('successful files:', result.successful)
+      console.log('failed files:', result.failed)
+    })
+
+    uppy.use(StatusBar, {
+      id: 'StatusBar',
+      target: '.files-app-bar',
+      hideAfterFinish: true,
+      showProgressDetails: true,
+      hideUploadButton: false,
+      hideRetryButton: false,
+      hidePauseResumeButton: false,
+      hideCancelButton: false,
+      doneButtonHandler: null,
+      locale: {}
+    })
+  },
+
+  beforeDestroy() {
+    this.uppy.close()
+  },
 
   methods: {
-    ...mapActions('Files', [
-      'updateFileProgress',
-      'removeFilesFromTrashbin',
-      'loadIndicators',
-      'setFileSelection'
-    ]),
+    ...mapActions('Files', ['removeFilesFromTrashbin', 'loadIndicators', 'setFileSelection']),
     ...mapActions(['openFile', 'showMessage', 'createModal', 'setModalInputErrorMessage']),
     ...mapMutations('Files', ['UPSERT_RESOURCE', 'SET_HIDDEN_FILES_VISIBILITY']),
     ...mapMutations(['SET_QUOTA']),
@@ -533,7 +613,7 @@ export default {
 
       return null
     },
-    async onFileSuccess(event, file) {
+    async onFileSuccess(file) {
       try {
         if (file.name) {
           file = file.name
@@ -572,13 +652,9 @@ export default {
     onFileError(error) {
       this.showMessage({
         title: this.$gettext('File upload failed…'),
-        desc: error.message,
+        desc: error,
         status: 'danger'
       })
-    },
-
-    onFileProgress(progress) {
-      this.updateFileProgress(progress)
     }
   }
 }
