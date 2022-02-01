@@ -18,20 +18,11 @@
       translate-comment="Number of selected resources displayed above the files list"
       >%{ amount } selected item
     </translate>
-    <oc-button
-      id="files-clear-selection"
-      v-oc-tooltip="clearSelectionLabel"
-      :aria-label="clearSelectionLabel"
-      class="oc-ml"
-      @click="RESET_SELECTION"
-    >
-      <oc-icon name="close" />
-    </oc-button>
   </div>
 </template>
 
 <script>
-import { mapGetters, mapMutations } from 'vuex'
+import { mapGetters } from 'vuex'
 
 import { cloneStateObject } from '../../../helpers/store'
 import MixinResources from '../../../mixins/resources'
@@ -54,15 +45,7 @@ export default {
       }
 
       return this.getResourceSize(size)
-    },
-
-    clearSelectionLabel() {
-      return this.$gettext('Clear selection')
     }
-  },
-
-  methods: {
-    ...mapMutations('Files', ['RESET_SELECTION'])
   }
 }
 </script>

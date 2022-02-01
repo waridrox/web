@@ -82,11 +82,19 @@ const newFileHandlers = [
   }
 ]
 
-const selectedFiles = [
+const selectedFile = [
   {
     path: '/lorem.txt',
     canBeDeleted: jest.fn(() => true)
   }
+]
+
+const selectedFiles = [
+  {
+    path: '/lorem.txt',
+    canBeDeleted: jest.fn(() => true)
+  },
+  ...selectedFile
 ]
 
 const currentFolder = {
@@ -188,17 +196,35 @@ describe('AppBar component', () => {
       )
     })
 
-    describe('when an item is selected', () => {
-      it('should hide "New" button but show size info', () => {
+    describe('when one resource is selected', () => {
+      it('should hide "New" button but show size info and no batch actions', () => {
+        const store = createStore({ currentFolder, selected: selectedFile })
+        const wrapper = getShallowWrapper(route, store)
+        const newButton = wrapper.find(elSelector.newFileButton)
+        const ocDrop = wrapper.find(elSelector.ocDrop)
+        const sizeInfo = wrapper.find(elSelector.sizeInfo)
+        const batchActions = wrapper.find(elSelector.batchActions)
+
+        expect(newButton.exists()).toBeFalsy()
+        expect(ocDrop.exists()).toBeFalsy()
+        expect(sizeInfo.exists()).toBeTruthy()
+        expect(batchActions.exists()).toBeFalsy()
+      })
+    })
+
+    describe('when more than one resource is selected', () => {
+      it('should hide "New" button, but show size info and batch actions', () => {
         const store = createStore({ currentFolder, selected: selectedFiles })
         const wrapper = getShallowWrapper(route, store)
         const newButton = wrapper.find(elSelector.newFileButton)
         const ocDrop = wrapper.find(elSelector.ocDrop)
         const sizeInfo = wrapper.find(elSelector.sizeInfo)
+        const batchActions = wrapper.find(elSelector.batchActions)
 
         expect(newButton.exists()).toBeFalsy()
         expect(ocDrop.exists()).toBeFalsy()
-        expect(sizeInfo.isVisible()).toBeTruthy()
+        expect(sizeInfo.exists()).toBeTruthy()
+        expect(batchActions.exists()).toBeTruthy()
       })
     })
   })
@@ -233,11 +259,25 @@ describe('AppBar component', () => {
         const sizeInfo = wrapper.find(elSelector.sizeInfo)
 
         expect(sizeInfo.exists()).toBeFalsy()
-        expect(batchActions.isVisible()).toBeTruthy()
+        // FIXME: Revert below later to `toBeTruthy`
+        expect(batchActions.exists()).toBeFalsy()
       })
     })
 
-    describe('when an item is selected', () => {
+    describe('when one item is selected', () => {
+      it('should show size info but no batch actions', () => {
+        const store = createStore({ currentFolder, selected: selectedFile })
+        wrapper = getShallowWrapper(route, store)
+
+        const sizeInfo = wrapper.find(elSelector.sizeInfo)
+        const batchActions = wrapper.find(elSelector.batchActions)
+
+        expect(sizeInfo.exists()).toBeTruthy()
+        expect(batchActions.exists()).toBeFalsy()
+      })
+    })
+
+    describe('when more than one item is selected', () => {
       it('should show size info and batch actions', () => {
         const store = createStore({ currentFolder, selected: selectedFiles })
         wrapper = getShallowWrapper(route, store)
@@ -245,8 +285,8 @@ describe('AppBar component', () => {
         const sizeInfo = wrapper.find(elSelector.sizeInfo)
         const batchActions = wrapper.find(elSelector.batchActions)
 
-        expect(sizeInfo.isVisible()).toBeTruthy()
-        expect(batchActions.isVisible()).toBeTruthy()
+        expect(sizeInfo.exists()).toBeTruthy()
+        expect(batchActions.exists()).toBeTruthy()
       })
     })
   })
@@ -281,13 +321,26 @@ describe('AppBar component', () => {
           const sizeInfo = wrapper.find(elSelector.sizeInfo)
           expect(sizeInfo.exists()).toBeFalsy()
         })
-        it('should show batch actions', () => {
+        it('should not show batch actions', () => {
           const batchActions = wrapper.find(elSelector.batchActions)
-          expect(batchActions.exists()).toBeTruthy()
+          expect(batchActions.exists()).toBeFalsy()
         })
       })
 
-      describe('when an item is selected', () => {
+      describe('when one item is selected', () => {
+        it('should show size info and no batch actions', () => {
+          const store = createStore({ currentFolder, selected: selectedFile })
+          wrapper = getShallowWrapper(route, store)
+
+          const sizeInfo = wrapper.find(elSelector.sizeInfo)
+          const batchActions = wrapper.find(elSelector.batchActions)
+
+          expect(sizeInfo.exists()).toBeTruthy()
+          expect(batchActions.exists()).toBeFalsy()
+        })
+      })
+
+      describe('when more than one item is selected', () => {
         it('should show size info and batch actions', () => {
           const store = createStore({ currentFolder, selected: selectedFiles })
           wrapper = getShallowWrapper(route, store)

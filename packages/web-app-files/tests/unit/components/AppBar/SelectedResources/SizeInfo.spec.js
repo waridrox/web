@@ -73,18 +73,6 @@ describe('SizeInfo component', () => {
       expect(translate.props().translateParams.size).toBeFalsy()
       expect(translate.text()).toEqual('%{ amount } selected item')
     })
-    it('should trigger "RESET_SELECTION" if clear button is clicked', () => {
-      const spyResetSelection = jest.spyOn(SizeInfo.methods, 'RESET_SELECTION').mockImplementation()
-      const store = createStore({ selected: selectedFiles })
-      const wrapper = createWrapper({
-        store,
-        stubs: { ...componentStubs, 'oc-button': false }
-      })
-      const clearSelectionButton = wrapper.find('button')
-      clearSelectionButton.trigger('click')
-
-      expect(spyResetSelection).toHaveBeenCalledTimes(1)
-    })
   })
 })
 

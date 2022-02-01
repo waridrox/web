@@ -44,6 +44,7 @@ function getWrapper(applicationsList = []) {
       'oc-button': true,
       'oc-icon': true,
       'oc-drop': true,
+      'oc-list': true,
       'router-link': true
     },
     directives: {

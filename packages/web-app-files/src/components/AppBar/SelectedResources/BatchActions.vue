@@ -1,5 +1,15 @@
 <template>
   <oc-list class="oc-files-appbar-batch-actions oc-width-1-1">
+    <li>
+      <oc-button
+        id="files-clear-selection"
+        v-oc-tooltip="clearSelectionLabel"
+        :aria-label="clearSelectionLabel"
+        @click="RESET_SELECTION"
+      >
+        <oc-icon name="close" />
+      </oc-button>
+    </li>
     <action-menu-item
       v-for="(action, i) in menuItemsBatchActions"
       :key="`batch-action-${i}`"
@@ -12,7 +22,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 import ActionMenuItem from '../../ActionMenuItem.vue'
 import AcceptShare from '../../../mixins/actions/acceptShare'
 import Copy from '../../../mixins/actions/copy'
@@ -47,6 +57,10 @@ export default {
       }
     },
 
+    clearSelectionLabel() {
+      return this.$gettext('Clear selection')
+    },
+
     menuItemsBatchActions() {
       return [
         ...this.$_acceptShare_items,
@@ -60,6 +74,10 @@ export default {
         ...this.$_restore_items
       ].filter((item) => item.isEnabled({ resources: this.selectedFiles }))
     }
+  },
+
+  methods: {
+    ...mapMutations('Files', ['RESET_SELECTION'])
   }
 }
 </script>
@@ -74,6 +92,11 @@ export default {
   }
 
   @media only screen and (min-width: 1200px) {
+    li {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+
     align-items: center;
     display: flex;
     gap: var(--oc-space-small);

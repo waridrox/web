@@ -28,7 +28,7 @@
       <h1 class="oc-invisible-sr" v-text="pageTitle" />
       <div class="files-app-bar-actions">
         <div
-          v-if="showActions || selectedFiles.length > 0 || hasBulkActions"
+          v-if="showActions || selectedFiles.length < 2 || hasBulkActions"
           class="oc-flex-1 oc-flex oc-flex-start"
         >
           <template v-if="showActions && areDefaultActionsVisible">
@@ -123,7 +123,7 @@
             </oc-drop>
           </template>
           <size-info v-if="hasBulkActions && selectedFiles.length > 0" class="oc-mr oc-visible@l" />
-          <batch-actions v-if="hasBulkActions" />
+          <batch-actions v-if="hasBulkActions && selectedFiles.length > 1" />
         </div>
         <view-options />
       </div>
@@ -310,15 +310,17 @@ export default {
     },
 
     selectedResourcesAnnouncement() {
-      if (this.selectedFiles.length === 0) {
-        return this.$gettext('No items selected.')
+      switch (this.selectedFiles.length) {
+        case 0:
+          return this.$gettext('No items selected.')
+        case 1:
+          return this.$gettext('One item selected.')
+        default:
+          return this.$gettextInterpolate(
+            '%{ amount } items selected. Actions are available above the table.',
+            { amount: this.selectedFiles.length }
+          )
       }
-      const translated = this.$ngettext(
-        '%{ amount } item selected. Actions are available above the table.',
-        '%{ amount } items selected. Actions are available above the table.',
-        this.selectedFiles.length
-      )
-      return this.$gettextInterpolate(translated, { amount: this.selectedFiles.length })
     },
 
     newFileHandlersForRoute() {
