@@ -34,11 +34,13 @@ When('the user closes the markdown editor using the webUI', async () => {
 })
 
 Then('the file {string} should be displayed in the markdown editor webUI', async (fileName) => {
+  await markdownEditor.waitForPageLoaded()
   const actualFileName = await markdownEditor.getFileName()
   return assertEqualText(fileName, actualFileName)
 })
 
 Then('the file should have content {string} in the markdown editor webUI', async (content) => {
+  await markdownEditor.waitForPageLoaded()
   const contentInEditor = await markdownEditor.getContentFromEditor()
   return assertEqualText(content, contentInEditor, 'content')
 })
@@ -49,6 +51,7 @@ Then('the file should not have content {string} in the markdown editor webUI', a
 })
 
 Then('the preview panel should have the content {string} on the webUI', async (content) => {
+  await markdownEditor.waitForPageLoaded()
   const contentInPreview = await markdownEditor.getContentFromPanel()
   return assertEqualText(content, contentInPreview, 'content')
 })
@@ -63,6 +66,7 @@ When(
 Then(
   'the preview panel should have {string} element with text {string}',
   async (tagName, innerText) => {
+    await markdownEditor.waitForPageLoaded()
     return await assertHasElementWithText(tagName, innerText)
   }
 )

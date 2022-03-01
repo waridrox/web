@@ -42,10 +42,14 @@ module.exports = {
       return this.elements.previewPanel.selector
     },
     saveFileEdit: function () {
-      return this.waitForElementVisible('@saveButton').click('@saveButton')
+      return this.waitForElementVisible('@saveButton')
+        .click('@saveButton')
+        .waitForAjaxCallsToStartAndFinish()
     },
     closeMarkdownEditor: function () {
-      return this.waitForElementVisible('@closeButton').click('@closeButton')
+      return this.waitForElementVisible('@closeButton')
+        .click('@closeButton')
+        .waitForAnimationToFinish()
     },
     /**
      * clears and updates textarea with new value
