@@ -115,3 +115,7 @@ const assertHasElementWithText = async (tagName, innerText) => {
       '" but not found'
   )
 }
+Then(/^the user wait for "([^"]*)" ms$/, async function (time) {
+  console.log('waiting for ' + time + ' ms')
+  await client.pause(parseInt(time))
+})
