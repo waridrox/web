@@ -11,7 +11,7 @@ module.exports = {
       try {
         await this.waitForElementNotPresent({
           selector: '@confirmBtn',
-          timeout: 200
+          timeout: 500
         })
       } catch (e) {
         console.error(e)
