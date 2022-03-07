@@ -31,3 +31,8 @@ Feature: Create public link to folder
     When the public reloads the public link pages
     Then the public should not see the following files on the files-drop page
       | textfile.txt |
+    When "Alice" opens the "files" app
+    And "Alice" downloads the following files using batch action
+      | resource     | from         |
+      | lorem.txt    | folderPublic |
+      | textfile.txt | folderPublic |
