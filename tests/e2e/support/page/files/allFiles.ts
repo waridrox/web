@@ -2,12 +2,22 @@ import { Download } from 'playwright'
 import { User, Actor, File } from '../../types'
 import { filesCta } from '../../cta'
 import path from 'path'
+import util = require('util')
+import { Locator, expect } from '@playwright/test'
 
 export class AllFilesPage {
   private readonly actor: Actor
+  private readonly checkboxSelector: string
+  private readonly batchActionDownloadLocator: Locator
 
   constructor({ actor }: { actor: Actor }) {
     this.actor = actor
+    this.checkboxSelector =
+      '//span[contains(@class, "oc-resource-name") and (@data-test-resource-name="%s" or @data-test-resource-path="/%s")]' +
+      '/ancestor::tr[contains(@class, "oc-tbody-tr")]//input[@type="checkbox"]'
+    this.batchActionDownloadLocator = this.actor.page.locator(
+      '.oc-files-actions-download-archive-trigger'
+    )
   }
 
   async navigate(): Promise<void> {
@@ -109,6 +119,39 @@ export class AllFilesPage {
     await page.goto(startUrl)
 
     return downloads
+  }
+
+  async downloadFilesBatchAction({
+    names,
+    folder
+  }: {
+    names: string[]
+    folder: string
+  }): Promise<Download[]> {
+    const { page } = this.actor
+    const startUrl = page.url()
+    const downloads = []
+    if (folder) {
+      await filesCta.navigateToFolder({ page: page, path: folder })
+    }
+    for (const name of names) {
+      await this.toggleFileOrFolderCheckbox(page, true, name)
+    }
+    const [download] = await Promise.all([
+      page.waitForEvent('download'),
+      this.batchActionDownloadLocator.click()
+    ])
+    downloads.push(download)
+    await page.goto(startUrl)
+    return downloads
+  }
+
+  async toggleFileOrFolderCheckbox(page, enable, path) {
+    const checkBoxLocator = util.format(this.checkboxSelector, path)
+    if (enable) {
+      await page.check(checkBoxLocator)
+      expect(await page.isChecked(checkBoxLocator)).toBeTruthy()
+    } else await page.uncheck(checkBoxLocator)
   }
 
   async shareResource({

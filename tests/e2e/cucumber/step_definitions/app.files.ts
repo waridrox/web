@@ -138,7 +138,7 @@ Then(
   }
 )
 
-Given(
+When(
   '{string} downloads the following file(s)',
   async function (this: World, stepUser: string, stepTable: DataTable) {
     const actor = this.actorsEnvironment.getActor({ id: stepUser })
@@ -167,6 +167,37 @@ Given(
         expect(files).toContain(download.suggestedFilename())
       })
     }
+  }
+)
+When(
+  '{string} downloads the following file(s) using batch action',
+  async function (this: World, stepUser: string, stepTable: DataTable) {
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
+    let files, downloads
+    await allFilesPage.navigate()
+
+    const downloadInfo = stepTable.hashes().reduce((acc, stepRow) => {
+      const { resource, from } = stepRow
+
+      if (!acc[from]) {
+        acc[from] = []
+      }
+
+      acc[from].push(resource)
+
+      return acc
+    }, {})
+
+    for (const folder of Object.keys(downloadInfo)) {
+      files = downloadInfo[folder]
+      downloads = await allFilesPage.downloadFilesBatchAction({ folder, names: files })
+    }
+
+    expect(downloads.length).toBe(1)
+    downloads.forEach((download) => {
+      expect(download.suggestedFilename()).toBe('download.tar')
+    })
   }
 )
 
