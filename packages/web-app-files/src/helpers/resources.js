@@ -237,8 +237,16 @@ export function buildWebDavFilesPath(userId, path) {
   return '/' + `files/${userId}/${path}`.split('/').filter(Boolean).join('/')
 }
 
+export function buildWebDavFilesTrashPath(userId, path = '') {
+  return '/' + `trash-bin/${userId}/${path}`.split('/').filter(Boolean).join('/')
+}
+
 export function buildWebDavSpacesPath(spaceId, path) {
   return '/' + `spaces/${spaceId}/${path}`.split('/').filter(Boolean).join('/')
+}
+
+export function buildWebDavSpacesTrashPath(spaceId, path) {
+  return '/' + `trash-bin/${spaceId}/${path}`.split('/').filter(Boolean).join('/')
 }
 
 export function attachIndicators(resource, sharesTree) {
