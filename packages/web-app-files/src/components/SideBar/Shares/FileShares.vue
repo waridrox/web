@@ -43,6 +43,18 @@
           </li>
         </ul>
       </template>
+      <template v-if="showSpaceMembers">
+        <h4 class="oc-text-initial oc-text-bold oc-my-s" v-text="spaceMemberLabel" />
+        <ul
+          id="space-collaborators-list"
+          class="oc-list oc-list-divider oc-overflow-hidden oc-m-rm"
+          :aria-label="spaceMemberLabel"
+        >
+          <li v-for="collaborator in spaceMembers" :key="collaborator.key">
+            <collaborator-list-item :share="collaborator" :modifiable="false" />
+          </li>
+        </ul>
+      </template>
     </template>
   </div>
 </template>
@@ -55,6 +67,11 @@ import { dirname } from 'path'
 import InviteCollaboratorForm from './InviteCollaborator/InviteCollaboratorForm.vue'
 import CollaboratorListItem from './Collaborators/ListItem.vue'
 import { ShareTypes } from '../../../helpers/share'
+import { useStore } from 'web-pkg/src/composables'
+import { clientService } from 'web-pkg/src/services'
+import { useTask } from 'vue-concurrency'
+import { buildSpaceShare } from '../../../helpers/resources'
+import { sortSpaceMembers } from '../../../helpers/space'
 
 export default {
   title: ($gettext) => {
@@ -65,10 +82,45 @@ export default {
     InviteCollaboratorForm,
     CollaboratorListItem
   },
+  inject: {
+    currentSpace: {
+      default: null
+    }
+  },
+  setup() {
+    const store = useStore()
+
+    const loadSpaceMembersTask = useTask(function* (signal, ref) {
+      const graphClient = clientService.graphAuthenticated(
+        store.getters.configuration.server,
+        store.getters.getToken
+      )
+
+      const promises = []
+      const spaceShares = []
+
+      for (const role of Object.keys(ref.space.spaceRoles)) {
+        for (const userId of ref.space.spaceRoles[role]) {
+          promises.push(
+            graphClient.users.getUser(userId).then((resolved) => {
+              spaceShares.push(buildSpaceShare({ ...resolved.data, role }, ref.space.id))
+            })
+          )
+        }
+      }
+
+      yield Promise.all(promises).then(() => {
+        ref.spaceMembers = sortSpaceMembers(spaceShares)
+      })
+    })
+
+    return { loadSpaceMembersTask }
+  },
   data() {
     return {
       currentShare: null,
-      showShareesList: true
+      showShareesList: true,
+      spaceMembers: []
     }
   },
   computed: {
@@ -83,6 +135,9 @@ export default {
 
     sharedWithLabel() {
       return this.$gettext('Shared with')
+    },
+    spaceMemberLabel() {
+      return this.$gettext('Space Members')
     },
 
     hasSharees() {
@@ -205,6 +260,15 @@ export default {
       }
 
       return null
+    },
+    space() {
+      return this.currentSpace?.value
+    },
+    currentUserIsMemberOfSpace() {
+      return this.space?.spaceMemberIds.includes(this.user.uuid)
+    },
+    showSpaceMembers() {
+      return this.space && this.currentUserIsMemberOfSpace
     }
   },
   watch: {
@@ -213,6 +277,14 @@ export default {
         if (oldItem !== newItem) {
           this.$_reloadShares()
           this.showShareesList = true
+        }
+      },
+      immediate: true
+    },
+    space: {
+      handler: function () {
+        if (this.showSpaceMembers) {
+          this.loadSpaceMembersTask.perform(this)
         }
       },
       immediate: true
