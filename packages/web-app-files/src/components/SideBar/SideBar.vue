@@ -268,14 +268,16 @@ export default {
     if (!this.areMultipleSelected) {
       await this.fetchFileInfo()
     }
-    if (this.$route.params.spaceId && !this.highlightedFileIsSpace) {
-      this.loadSpaceTask.perform(this, this.$route.params.spaceId)
-    }
     this.$nextTick(this.initVisibilityObserver)
   },
   beforeDestroy() {
     visibilityObserver.disconnect()
     hiddenObserver.disconnect()
+  },
+  mounted() {
+    if (this.$route.params.spaceId && !this.highlightedFileIsSpace) {
+      this.loadSpaceTask.perform(this, this.$route.params.spaceId)
+    }
   },
   methods: {
     ...mapActions('Files/sidebar', {
