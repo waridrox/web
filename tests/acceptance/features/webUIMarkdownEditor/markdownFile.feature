@@ -23,31 +23,15 @@ Feature: create markdown files
     When the user inputs the content "updated content" in the markdown editor webUI
     And the user saves the file in the markdown editor webUI
     And the user closes the markdown editor using the webUI
-    # just checking using the ui anyway
-    When the user opens file "simple.md" in the markdown editor using the action menu option on the webUI
-    Then the preview panel should have the content "updated content" on the webUI
-    And as "Alice" the file "simple.md" should have the content "updated content" in the server
-
-
-  @disablePreviews
-  Scenario: update a markdown file with new content
-    Given the user has opened file "simple.md" in the markdown editor webUI
-    When the user inputs the content "updated content" in the markdown editor webUI
-    And the user saves the file in the markdown editor webUI
-    And the user closes the markdown editor using the webUI
-    And the user wait for "10000" ms
     Then as "Alice" the file "simple.md" should have the content "updated content" in the server
-    
+
   @disablePreviews
   Scenario: append new content in a markdown file
     Given the user has opened file "simple.md" in the markdown editor webUI
     When the user appends the content " new content added" in the markdown editor webUI
     And the user saves the file in the markdown editor webUI
     And the user closes the markdown editor using the webUI
-    # just checking using the ui anyway
-    When the user opens file "simple.md" in the markdown editor using the action menu option on the webUI
-    Then the preview panel should have the content "simple markdown file new content added" on the webUI
-    And as "Alice" the file "simple.md" should have the content "simple markdown file new content added" in the server
+    Then as "Alice" the file "simple.md" should have the content "simple markdown file new content added" in the server
 
   @disablePreviews
   Scenario: close the markdown editor without saving the updated content
@@ -60,7 +44,6 @@ Feature: create markdown files
   Scenario: preview content of the file
     When the user opens file "simple.md" in the markdown editor webUI
     Then the file "simple.md" should be displayed in the markdown editor webUI
-    And the user wait for "10000" ms
     And the preview panel should have the content "simple markdown file" on the webUI
 
   @disablePreviews
