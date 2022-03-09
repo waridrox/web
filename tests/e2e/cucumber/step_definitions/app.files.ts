@@ -1,4 +1,4 @@
-import { DataTable, Given, Then, When } from '@cucumber/cucumber'
+import { DataTable, Then, When } from '@cucumber/cucumber'
 import { expect } from '@playwright/test'
 import * as assert from 'assert'
 import { World } from '../environment'
@@ -176,28 +176,30 @@ When(
     const { allFiles: allFilesPage } = new FilesPage({ actor })
     let files, downloads
     await allFilesPage.navigate()
+    // Archiver download is not implemented in OC10 yet
+    // https://github.com/owncloud/web/issues/6239
+    // so this step is skipped in OC10, make sure to remove
+    // the check when the feature gets implemented
+    if (config.ocis) {
+      const downloadInfo = stepTable.hashes().reduce((acc, stepRow) => {
+        const { resource, from } = stepRow
+        if (!acc[from]) {
+          acc[from] = []
+        }
+        acc[from].push(resource)
+        return acc
+      }, {})
 
-    const downloadInfo = stepTable.hashes().reduce((acc, stepRow) => {
-      const { resource, from } = stepRow
-
-      if (!acc[from]) {
-        acc[from] = []
+      for (const folder of Object.keys(downloadInfo)) {
+        files = downloadInfo[folder]
+        downloads = await allFilesPage.downloadFilesBatchAction({ folder, names: files })
       }
 
-      acc[from].push(resource)
-
-      return acc
-    }, {})
-
-    for (const folder of Object.keys(downloadInfo)) {
-      files = downloadInfo[folder]
-      downloads = await allFilesPage.downloadFilesBatchAction({ folder, names: files })
+      expect(downloads.length).toBe(1)
+      downloads.forEach((download) => {
+        expect(download.suggestedFilename()).toBe('download.tar')
+      })
     }
-
-    expect(downloads.length).toBe(1)
-    downloads.forEach((download) => {
-      expect(download.suggestedFilename()).toBe('download.tar')
-    })
   }
 )
 

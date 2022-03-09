@@ -7,6 +7,7 @@ Feature: Create public link to folder
     Given the following users have been created
       | Alice |
 
+  @issue-6239
   Scenario: Alice creates public link to a folder
     When "Alice" logs in
     And "Alice" opens the "files" app
@@ -32,6 +33,9 @@ Feature: Create public link to folder
     Then the public should not see the following files on the files-drop page
       | textfile.txt |
     When "Alice" opens the "files" app
+    # Archiver download is not implemented in OC10 yet
+    # https://github.com/owncloud/web/issues/6239 
+    # so this step is skipped in OC10
     And "Alice" downloads the following files using batch action
       | resource     | from         |
       | lorem.txt    | folderPublic |
