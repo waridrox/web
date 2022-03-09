@@ -2,7 +2,7 @@ import { Download } from 'playwright'
 import { User, Actor, File } from '../../types'
 import { filesCta } from '../../cta'
 import path from 'path'
-import util = require('util')
+import util from 'util'
 import { Locator, expect } from '@playwright/test'
 
 export class AllFilesPage {
