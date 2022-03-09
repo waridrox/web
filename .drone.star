@@ -724,7 +724,7 @@ def acceptance(ctx):
         "oc10IntegrationAppIncluded": False,
         "skip": False,
         "debugSuites": [],
-        "earlyFail": True,
+        "earlyFail": False,
         "retry": True,
     }
 
