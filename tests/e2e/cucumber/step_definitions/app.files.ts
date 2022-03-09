@@ -128,6 +128,14 @@ When(
   }
 )
 
+When(
+  '{string} changes the role of public link {string} to {string} ',
+  async function (this: World, stepUser: string, linkName: string, role: string): Promise<void> {
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { publicLink: publicLinkPage } = new FilesPage({ actor })
+  }
+)
+
 Then(
   '{string} should see {int} public link',
   async function (this: World, stepUser: string, expectedLinkNumber: number): Promise<void> {

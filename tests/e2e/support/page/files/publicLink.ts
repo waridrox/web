@@ -58,6 +58,12 @@ export class PublicLink {
     return await this.actor.page.locator(this.publicLinkListSelector).count()
   }
 
+  async setRole(actor, role: string): Promise<void> {
+    const { page } = this.actor
+    await this.roleDropdownLocator.click()
+    await this.actor.page.locator(util.format(this.roleSelector, role)).click()
+  }
+
   async createPublicLinkForResource({
     resource,
     name,
@@ -97,8 +103,7 @@ export class PublicLink {
     }
 
     if (role) {
-      await this.roleDropdownLocator.click()
-      await this.actor.page.locator(util.format(this.roleSelector, role)).click()
+      await this.setRole(this.actor, role)
     }
 
     if (dateOfExpiration) {

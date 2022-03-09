@@ -34,9 +34,10 @@ Feature: Create public link to folder
       | textfile.txt |
     When "Alice" opens the "files" app
     # Archiver download is not implemented in OC10 yet
-    # https://github.com/owncloud/web/issues/6239 
+    # https://github.com/owncloud/web/issues/6239
     # so this step is skipped in OC10
     And "Alice" downloads the following files using batch action
       | resource     | from         |
       | lorem.txt    | folderPublic |
       | textfile.txt | folderPublic |
+    And "Alice" changes the role of public link "myPublicLink" to "editor"
