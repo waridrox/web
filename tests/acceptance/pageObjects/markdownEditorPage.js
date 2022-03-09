@@ -43,13 +43,15 @@ module.exports = {
     },
     saveFileEdit: function () {
       return this.waitForElementVisible('@saveButton')
+        .initAjaxCounters()
         .click('@saveButton')
-        .waitForAjaxCallsToStartAndFinish()
+        .waitForOutstandingAjaxCalls()
     },
     closeMarkdownEditor: function () {
       return this.waitForElementVisible('@closeButton')
+        .initAjaxCounters()
         .click('@closeButton')
-        .waitForAnimationToFinish()
+        .waitForOutstandingAjaxCalls()
     },
     /**
      * clears and updates textarea with new value
