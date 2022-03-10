@@ -166,6 +166,7 @@ import { createLocationSpaces } from '../../router'
 import { mapMutations, mapActions, mapGetters } from 'vuex'
 import Rename from '../../mixins/spaces/actions/rename'
 import Delete from '../../mixins/spaces/actions/delete'
+import DeletedFiles from '../../mixins/spaces/actions/deletedFiles'
 import Disable from '../../mixins/spaces/actions/disable'
 import Restore from '../../mixins/spaces/actions/restore'
 import EditDescription from '../../mixins/spaces/actions/editDescription'
@@ -181,7 +182,16 @@ export default {
     NoContentMessage,
     ListLoader
   },
-  mixins: [Rename, Delete, EditDescription, Disable, ShowDetails, Restore, UploadImage],
+  mixins: [
+    Rename,
+    Delete,
+    EditDescription,
+    DeletedFiles,
+    Disable,
+    ShowDetails,
+    Restore,
+    UploadImage
+  ],
   setup() {
     const store = useStore()
     const spaces = computed(() => store.getters['Files/activeFiles'] || [])
@@ -279,6 +289,7 @@ export default {
         ...this.$_rename_items,
         ...this.$_editDescription_items,
         ...this.$_uploadImage_items,
+        ...this.$_deletedFiles_items,
         ...this.$_restore_items,
         ...this.$_delete_items,
         ...this.$_disable_items,
