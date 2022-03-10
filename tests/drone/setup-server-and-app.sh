@@ -28,4 +28,5 @@ else
 	fi
 	php occ config:system:set sharing.federation.allowHttpFallback --value=true --type=bool
 	php occ config:system:set web.rewriteLinks --value=true
+	php occ config:list
 fi
