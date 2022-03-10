@@ -70,7 +70,7 @@ import { ShareTypes } from '../../../helpers/share'
 import { useStore } from 'web-pkg/src/composables'
 import { clientService } from 'web-pkg/src/services'
 import { useTask } from 'vue-concurrency'
-import { buildSpaceShare } from '../../../helpers/resources'
+import { buildSpace, buildSpaceShare } from '../../../helpers/resources'
 import { sortSpaceMembers } from '../../../helpers/space'
 
 export default {
@@ -82,28 +82,32 @@ export default {
     InviteCollaboratorForm,
     CollaboratorListItem
   },
-  inject: {
-    currentSpace: {
-      default: null
-    }
-  },
   setup() {
     const store = useStore()
+    const graphClient = clientService.graphAuthenticated(
+      store.getters.configuration.server,
+      store.getters.getToken
+    )
+
+    const loadSpaceTask = useTask(function* (signal, ref, spaceId) {
+      const graphResponse = yield graphClient.drives.getDrive(spaceId)
+
+      if (!graphResponse.data) {
+        return
+      }
+
+      ref.currentSpace = buildSpace(graphResponse.data)
+    })
 
     const loadSpaceMembersTask = useTask(function* (signal, ref) {
-      const graphClient = clientService.graphAuthenticated(
-        store.getters.configuration.server,
-        store.getters.getToken
-      )
-
       const promises = []
       const spaceShares = []
 
-      for (const role of Object.keys(ref.space.spaceRoles)) {
-        for (const userId of ref.space.spaceRoles[role]) {
+      for (const role of Object.keys(ref.currentSpace.spaceRoles)) {
+        for (const userId of ref.currentSpace.spaceRoles[role]) {
           promises.push(
             graphClient.users.getUser(userId).then((resolved) => {
-              spaceShares.push(buildSpaceShare({ ...resolved.data, role }, ref.space.id))
+              spaceShares.push(buildSpaceShare({ ...resolved.data, role }, ref.currentSpace.id))
             })
           )
         }
@@ -114,12 +118,13 @@ export default {
       })
     })
 
-    return { loadSpaceMembersTask }
+    return { loadSpaceTask, loadSpaceMembersTask }
   },
   data() {
     return {
       currentShare: null,
       showShareesList: true,
+      currentSpace: null,
       spaceMembers: []
     }
   },
@@ -261,14 +266,15 @@ export default {
 
       return null
     },
-    space() {
-      return this.currentSpace?.value
-    },
     currentUserIsMemberOfSpace() {
-      return this.space?.spaceMemberIds.includes(this.user.uuid)
+      return this.currentSpace?.spaceMemberIds.includes(this.user.uuid)
     },
     showSpaceMembers() {
-      return this.space && this.currentUserIsMemberOfSpace
+      return (
+        this.currentSpace &&
+        this.highlightedFile.type !== 'space' &&
+        this.currentUserIsMemberOfSpace
+      )
     }
   },
   watch: {
@@ -280,17 +286,17 @@ export default {
         }
       },
       immediate: true
-    },
-    space: {
-      handler: function () {
-        if (this.showSpaceMembers) {
-          this.loadSpaceMembersTask.perform(this)
-        }
-      },
-      immediate: true
     }
   },
+  async mounted() {
+    if (this.$route.params.spaceId) {
+      await this.loadSpaceTask.perform(this, this.$route.params.spaceId)
 
+      if (this.showSpaceMembers) {
+        this.loadSpaceMembersTask.perform(this)
+      }
+    }
+  },
   methods: {
     ...mapActions('Files', [
       'loadCurrentFileOutgoingShares',

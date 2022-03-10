@@ -91,19 +91,16 @@ import { mapGetters, mapState, mapActions } from 'vuex'
 import { VisibilityObserver } from 'web-pkg/src/observer'
 import { DavProperties } from 'web-pkg/src/constants'
 
-import { buildResource, buildSpace } from '../../helpers/resources'
+import { buildResource } from '../../helpers/resources'
 import {
   isLocationCommonActive,
   isLocationPublicActive,
   isLocationSharesActive
 } from '../../router'
-import { computed, ref } from '@vue/composition-api'
+import { computed } from '@vue/composition-api'
 
 import FileInfo from './FileInfo.vue'
 import SpaceInfo from './SpaceInfo.vue'
-import { useTask } from 'vue-concurrency'
-import { clientService } from 'web-pkg/src/services'
-import { useStore } from 'web-pkg/src/composables'
 
 let visibilityObserver
 let hiddenObserver
@@ -113,30 +110,8 @@ export default {
 
   provide() {
     return {
-      displayedItem: computed(() => this.selectedFile),
-      currentSpace: computed(() => this.currentSpace)
+      displayedItem: computed(() => this.selectedFile)
     }
-  },
-
-  setup() {
-    const currentSpace = ref(null)
-    const store = useStore()
-
-    const loadSpaceTask = useTask(function* (signal, ref, spaceId) {
-      const graphClient = clientService.graphAuthenticated(
-        store.getters.configuration.server,
-        store.getters.getToken
-      )
-      const graphResponse = yield graphClient.drives.getDrive(spaceId)
-
-      if (!graphResponse.data) {
-        return
-      }
-
-      currentSpace.value = buildSpace(graphResponse.data)
-    })
-
-    return { currentSpace, loadSpaceTask }
   },
 
   data() {
@@ -270,14 +245,10 @@ export default {
     }
     this.$nextTick(this.initVisibilityObserver)
   },
+
   beforeDestroy() {
     visibilityObserver.disconnect()
     hiddenObserver.disconnect()
-  },
-  mounted() {
-    if (this.$route.params.spaceId && !this.highlightedFileIsSpace) {
-      this.loadSpaceTask.perform(this, this.$route.params.spaceId)
-    }
   },
   methods: {
     ...mapActions('Files/sidebar', {
