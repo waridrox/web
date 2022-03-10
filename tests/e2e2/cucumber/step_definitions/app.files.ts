@@ -2,18 +2,16 @@ import { DataTable, Given, Then, When } from '@cucumber/cucumber'
 import { World } from '../environment'
 import { config } from '../../config'
 import { FilesPage } from '../../support'
-import { Personal } from '../../support/objects/app-files/pages/spaces/personal'
 import { expect } from '@playwright/test'
 import assert = require('assert')
-import { WithMe } from '../../support/objects/app-files/pages/shares/withMe'
 
 When(
   '{string} navigates to the files page',
   async function (this: World, stepUser: string): Promise<void> {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
 
-    await po.navigate()
+    await allFilesPage.navigate()
   }
 )
 
@@ -30,12 +28,12 @@ When(
 When(
   '{string} creates the following folder(s)',
   async function (this: World, stepUser: string, stepTable: DataTable): Promise<void> {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    const personal = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
     const folders = stepTable.raw().map((f) => f[0])
 
-    for (const name of folders) {
-      await personal.resource.create({ name, type: 'folder' })
+    for (const folder of folders) {
+      await allFilesPage.createFolder({ name: folder })
     }
   }
 )
@@ -43,10 +41,10 @@ When(
 When(
   '{string} uploads the following resource(s)',
   async function (this: World, stepUser: string, stepTable: DataTable): Promise<void> {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
 
-    await po.navigate()
+    await allFilesPage.navigate()
 
     const uploadInfo = stepTable.hashes().reduce((acc, stepRow) => {
       const { to, resource } = stepRow
@@ -61,7 +59,7 @@ When(
     }, {})
 
     for (const folder of Object.keys(uploadInfo)) {
-      await po.resource.upload({ to: folder, resources: uploadInfo[folder] })
+      await allFilesPage.uploadFiles({ folder, files: uploadInfo[folder] })
     }
   }
 )
@@ -75,8 +73,8 @@ When(
     actionType: string,
     stepTable: DataTable
   ) {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
 
     const shareInfo = stepTable.hashes().reduce((acc, stepRow) => {
       const { user, resource, role } = stepRow
@@ -92,7 +90,7 @@ When(
     }, {})
 
     for (const folder of Object.keys(shareInfo)) {
-      await po.resource.share({
+      await allFilesPage.shareResource({
         folder,
         users: shareInfo[folder].users,
         role: shareInfo[folder].role,
@@ -111,13 +109,12 @@ When(
     actionType: string,
     stepTable: DataTable
   ) {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    // const { publicLink: publicLinkPage } = new FilesPage({ actor })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { publicLink: publicLinkPage } = new FilesPage({ actor })
     const shareInfo = stepTable.hashes()
     for (const linkShare of shareInfo) {
       const { resource, name, role, dateOfExpiration, password } = linkShare
-      await po.resource.createLink({
+      await publicLinkPage.createPublicLinkForResource({
         resource,
         name,
         role,
@@ -142,12 +139,10 @@ Then(
 Given(
   '{string} downloads the following file(s)',
   async function (this: World, stepUser: string, stepTable: DataTable) {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    // const { allFiles: allFilesPage } = new FilesPage({ actor })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
 
-    // await allFilesPage.navigate()
-    await po.navigate()
+    await allFilesPage.navigate()
 
     const downloadInfo = stepTable.hashes().reduce((acc, stepRow) => {
       const { resource, from } = stepRow
@@ -163,7 +158,7 @@ Given(
 
     for (const folder of Object.keys(downloadInfo)) {
       const files = downloadInfo[folder]
-      const downloads = await po.resource.download({ folder, names: files })
+      const downloads = await allFilesPage.downloadFiles({ folder, names: files })
 
       expect(files.length).toBe(downloads.length)
       downloads.forEach((download) => {
@@ -178,14 +173,13 @@ When(
   async function (this: World, stepUser: string, stepTable: DataTable) {
     // Todo: implement explicit step definition for *.navigate()
 
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    // const { sharedWithMe: sharedWithMePage } = new FilesPage({ actor })
-    const po = new WithMe({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { sharedWithMe: sharedWithMePage } = new FilesPage({ actor })
     const shares = stepTable.raw().map((f) => f[0])
-    await po.navigate()
+    await sharedWithMePage.navigate()
 
     for (const share of shares) {
-      await po.shares.accept({ name: share })
+      await sharedWithMePage.acceptShare({ name: share })
     }
   }
 )
@@ -213,16 +207,16 @@ When(
     _: string,
     stepTable: DataTable
   ): Promise<void> {
-    const { page } = this.actorsEnvironment.getActor({ id: stepUser })
-    // const { allFiles: allFilesPage } = new FilesPage({ actor })
-    const po = new Personal({ page })
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
 
-    await po.navigate()
+    await allFilesPage.navigate()
 
     for (const { resource, to } of stepTable.hashes()) {
-      await po.resource[actionType === 'copies' ? 'copy' : 'move']({
+      await allFilesPage.moveOrCopyResource({
         resource,
-        newLocation: to
+        newLocation: to,
+        action: actionType === 'copies' ? 'copy' : 'move'
       })
     }
   }

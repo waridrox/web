@@ -15,9 +15,9 @@ Feature: Create public link to folder
     And "Alice" uploads the following resource
       | resource  | to           |
       | lorem.txt | folderPublic |
-    #Then "Alice" should see the following resource
-    #  | folderPublic/lorem.txt |
+    Then "Alice" should see the following resource
+      | folderPublic/lorem.txt |
     When "Alice" creates a public link to the following resource via the sidebar panel
       | resource     | name         | role     | dateOfExpiration | password |
       | folderPublic | myPublicLink | uploader | +5 days          | 12345    |
-    #Then "Alice" should see 1 public link
+    Then "Alice" should see 1 public link
