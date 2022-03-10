@@ -1,14 +1,15 @@
 import { Download } from 'playwright'
-import { User, Actor, File } from '../../types'
-import { filesCta } from '../../cta'
+import { Locator } from '@playwright/test'
 import path from 'path'
 import util from 'util'
-import { Locator, expect } from '@playwright/test'
+import { User, Actor, File } from '../../types'
+import { filesCta } from '../../cta'
 
 export class AllFilesPage {
   private readonly actor: Actor
   private readonly checkboxSelector: string
   private readonly batchActionDownloadLocator: Locator
+  private static downloads = []
 
   constructor({ actor }: { actor: Actor }) {
     this.actor = actor
@@ -121,36 +122,31 @@ export class AllFilesPage {
     return downloads
   }
 
-  async downloadFilesBatchAction({
-    names,
-    folder
-  }: {
-    names: string[]
-    folder: string
-  }): Promise<Download[]> {
+  async downloadFilesBatchAction({ names, folder }: { names: string[]; folder: string }) {
     const { page } = this.actor
     const startUrl = page.url()
-    const downloads = []
     if (folder) {
       await filesCta.navigateToFolder({ page: page, path: folder })
     }
     for (const name of names) {
-      await this.toggleFileOrFolderCheckbox(page, true, name)
+      await this.toggleFileOrFolderCheckbox(page, name, true)
     }
     const [download] = await Promise.all([
       page.waitForEvent('download'),
       this.batchActionDownloadLocator.click()
     ])
-    downloads.push(download)
+    AllFilesPage.downloads.push(download)
     await page.goto(startUrl)
-    return downloads
   }
 
-  async toggleFileOrFolderCheckbox(page, enable, path) {
+  getDownloads() {
+    return AllFilesPage.downloads
+  }
+
+  async toggleFileOrFolderCheckbox(page, path, checked = true) {
     const checkBoxLocator = util.format(this.checkboxSelector, path)
-    if (enable) {
+    if (checked) {
       await page.check(checkBoxLocator)
-      expect(await page.isChecked(checkBoxLocator)).toBeTruthy()
     } else await page.uncheck(checkBoxLocator)
   }
 

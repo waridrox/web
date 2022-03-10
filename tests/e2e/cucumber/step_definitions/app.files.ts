@@ -174,7 +174,7 @@ When(
   async function (this: World, stepUser: string, stepTable: DataTable) {
     const actor = this.actorsEnvironment.getActor({ id: stepUser })
     const { allFiles: allFilesPage } = new FilesPage({ actor })
-    let files, downloads
+    let files
     await allFilesPage.navigate()
     // Archiver download is not implemented in OC10 yet
     // https://github.com/owncloud/web/issues/6239
@@ -192,9 +192,23 @@ When(
 
       for (const folder of Object.keys(downloadInfo)) {
         files = downloadInfo[folder]
-        downloads = await allFilesPage.downloadFilesBatchAction({ folder, names: files })
+        await allFilesPage.downloadFilesBatchAction({ folder, names: files })
       }
+    }
+  }
+)
 
+Then(
+  '{string} should see downloaded file {string}',
+  async function (this: World, stepUser: string, file: string): Promise<void> {
+    const actor = this.actorsEnvironment.getActor({ id: stepUser })
+    const { allFiles: allFilesPage } = new FilesPage({ actor })
+    // Archiver download is not implemented in OC10 yet
+    // https://github.com/owncloud/web/issues/6239
+    // so this step is skipped in OC10, make sure to remove
+    // the check when the feature gets implemented
+    if (config.ocis) {
+      const downloads = await allFilesPage.getDownloads()
       expect(downloads.length).toBe(1)
       downloads.forEach((download) => {
         expect(download.suggestedFilename()).toBe('download.tar')
