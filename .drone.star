@@ -178,7 +178,6 @@ config = {
             },
             "visualTesting": False,
             "screenShots": True,
-            "debugSuites": ["oC10Basic1"],
         },
         # These suites have all or most of their scenarios expected to fail.
         # Eliminate wasted CI time by not retrying the failing scenarios.
