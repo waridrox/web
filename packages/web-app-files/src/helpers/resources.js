@@ -245,8 +245,8 @@ export function buildWebDavSpacesPath(spaceId, path) {
   return '/' + `spaces/${spaceId}/${path}`.split('/').filter(Boolean).join('/')
 }
 
-export function buildWebDavSpacesTrashPath(spaceId, path) {
-  return '/' + `trash-bin/${spaceId}/${path}`.split('/').filter(Boolean).join('/')
+export function buildWebDavSpacesTrashPath(spaceId, path = '') {
+  return '/' + `/spaces/trash-bin/${spaceId}/${path}`.split('/').filter(Boolean).join('/')
 }
 
 export function attachIndicators(resource, sharesTree) {

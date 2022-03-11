@@ -6,7 +6,8 @@ import { isLocationTrashActive } from '../../router'
 import {
   buildDeletedResource,
   buildResource,
-  buildWebDavFilesTrashPath
+  buildWebDavFilesTrashPath,
+  buildWebDavSpacesTrashPath
 } from '../../helpers/resources'
 
 export class FolderLoaderTrashbin implements FolderLoader {
@@ -21,11 +22,10 @@ export class FolderLoaderTrashbin implements FolderLoader {
     return useTask(function* (signal1, signal2, ref) {
       ref.CLEAR_CURRENT_FILES_LIST()
 
-      const resources = yield ref.$client.fileTrash.list(
-        buildWebDavFilesTrashPath(context.store.getters.user.id),
-        '1',
-        DavProperties.Trashbin
-      )
+      const path = isLocationTrashActive(context.router, 'files-trash-spaces-project')
+        ? buildWebDavSpacesTrashPath(context.route.params.spaceId)
+        : buildWebDavFilesTrashPath(context.store.getters.user.id)
+      const resources = yield ref.$client.fileTrash.list(path, '1', DavProperties.Trashbin)
 
       ref.LOAD_FILES({
         currentFolder: buildResource(resources[0]),
