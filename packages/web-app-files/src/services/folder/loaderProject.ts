@@ -3,9 +3,7 @@ import Router from 'vue-router'
 import { useTask } from 'vue-concurrency'
 import { isLocationSpacesActive } from '../../router'
 import { clientService } from 'web-pkg/src/services'
-import { useStore, useRouter } from 'web-pkg/src/composables'
 import { buildResource, buildSpace, buildWebDavSpacesPath } from '../../helpers/resources'
-import { unref } from '@vue/composition-api'
 
 export class FolderLoaderProject implements FolderLoader {
   public isEnabled(router: Router): boolean {
@@ -56,7 +54,8 @@ export class FolderLoaderProject implements FolderLoader {
       })
       ref.loadIndicators({
         client: ref.$client,
-        currentFolder: currentFolder?.path
+        currentFolder: currentFolder?.path,
+        spaceId: ref.space.id
       })
     })
   }
