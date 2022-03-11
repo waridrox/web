@@ -11,7 +11,7 @@ module.exports = {
      */
     navigateAndWaitTillLoaded: function (token) {
       this.navigate(this.url() + token)
-      return this.waitForElementPresent('@fileDropzone')
+      return this.waitForElementPresent('@fileDropzone1')
     },
     navigateAndWaitForPasswordPage: function (token) {
       this.navigate(this.url() + token)

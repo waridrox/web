@@ -178,6 +178,7 @@ config = {
             },
             "visualTesting": False,
             "screenShots": True,
+            "debugSuites": ["oC10Basic1"],
         },
         # These suites have all or most of their scenarios expected to fail.
         # Eliminate wasted CI time by not retrying the failing scenarios.
@@ -193,6 +194,7 @@ config = {
             "visualTesting": False,
             "screenShots": True,
             "retry": False,
+            "skip": True,
         },
         "webUINotification": {
             "type": NOTIFICATIONS,
@@ -210,6 +212,7 @@ config = {
             "visualTesting": False,
             "screenShots": True,
             "notificationsAppNeeded": True,
+            "skip": True,
         },
         "webUIFederation": {
             "type": FEDERATED,
@@ -224,6 +227,7 @@ config = {
             "notificationsAppNeeded": True,
             "federatedServerNeeded": True,
             "federatedServerVersion": OC10_VERSION,
+            "skip": True,
         },
         "webUI-XGA-Notifications": {
             "type": NOTIFICATIONS,
@@ -238,6 +242,7 @@ config = {
                 "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-XGA-with-oc10-server-oauth2-login.md" % dir["web"],
                 "SCREEN_RESOLUTION": "768x1024",
             },
+            "skip": True,
             "notificationsAppNeeded": True,
             "filterTags": "@smokeTest and not @skipOnXGAPortraitResolution and not @skip and not @skipOnOC10 and not @notToImplementOnOC10",
         },
@@ -316,6 +321,7 @@ config = {
                 "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-XGA-with-oc10-server-oauth2-login.md" % dir["web"],
                 "SCREEN_RESOLUTION": "768x1024",
             },
+            "skip": True,
             "filterTags": "@smokeTest and not @skipOnXGAPortraitResolution and not @skip and not @skipOnOC10 and not @notToImplementOnOC10",
         },
         "webUI-Notifications-iPhone": {
@@ -331,6 +337,7 @@ config = {
                 "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-Iphone-oc10-server-oauth2-login.md" % dir["web"],
                 "SCREEN_RESOLUTION": "375x812",
             },
+            "skip": True,
             "notificationsAppNeeded": True,
             "filterTags": "@smokeTest and not @skipOnIphoneResolution and not @skip and not @skipOnOC10 and not @notToImplementOnOC10",
         },
@@ -409,9 +416,11 @@ config = {
                 "EXPECTED_FAILURES_FILE": "%s/tests/acceptance/expected-failures-Iphone-oc10-server-oauth2-login.md" % dir["web"],
                 "SCREEN_RESOLUTION": "375x812",
             },
+            "skip": True,
             "filterTags": "@smokeTest and not @skipOnIphoneResolution and not @skip and not @skipOnOC10 and not @notToImplementOnOC10",
         },
         "webUI-ocis": {
+            "skip": True,
             "type": FULL,
             "servers": [
                 "",
@@ -520,6 +529,7 @@ config = {
             "screenShots": True,
         },
         "webUI-notifications-oc10-integration": {
+            "skip": True,
             "type": NOTIFICATIONS,
             "suites": {
                 "oC10IntegrationNotifications": [
@@ -539,6 +549,7 @@ config = {
             "screenShots": True,
         },
         "webUI-oc10-integration": {
+            "skip": True,
             "type": FULL,
             "suites": {
                 "oC10IntegrationApp1": [
@@ -798,7 +809,7 @@ def stagePipelines(ctx):
     unit_test_pipelines = unitTests(ctx)
     e2e_pipelines = e2eTests(ctx)
     acceptance_pipelines = acceptance(ctx)
-    return unit_test_pipelines + pipelinesDependsOn(e2e_pipelines, unit_test_pipelines) + pipelinesDependsOn(acceptance_pipelines, e2e_pipelines)
+    return acceptance_pipelines
 
 def afterPipelines(ctx):
     return build(ctx) + notify()
