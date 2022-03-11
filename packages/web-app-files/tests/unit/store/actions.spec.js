@@ -85,7 +85,8 @@ describe('vuex store actions', () => {
       await actions.loadCurrentFileOutgoingShares(stateMock, {
         client: clientMock,
         path: 'path',
-        resource: dataSet.space
+        resource: dataSet.space,
+        spaceId: dataSet.space?.id
       })
 
       expect(commitSpy).toBeCalledTimes(dataSet.expectedCommitCalls)
@@ -115,7 +116,8 @@ describe('vuex store actions', () => {
   describe('addShare', () => {
     it.each([
       { shareType: spaceShareMock.shareType, spaceId: spaceMock.id, expectedCommitCalls: 2 },
-      { shareType: shareMock.shareType, spaceId: null, expectedCommitCalls: 1 }
+      { shareType: shareMock.shareType, spaceId: null, expectedCommitCalls: 1 },
+      { shareType: shareMock.shareType, spaceId: 1, expectedCommitCalls: 1 }
     ])('succeeds using action %s', async (dataSet) => {
       const commitSpy = jest.spyOn(stateMock, 'commit')
 
