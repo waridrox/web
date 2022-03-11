@@ -8,8 +8,7 @@ DEEPDRIVER_DOCKER_ORACLE_XE_11G = "deepdiver/docker-oracle-xe-11g:latest"
 DRONE_CLI_ALPINE = "drone/cli:alpine"
 HENRICH_DOCKER_SAUCE_CONNECT = "henrrich/docker-sauce-connect:latest"
 MELTWATER_DRONE_CACHE = "meltwater/drone-cache:v1"
-MINIO_MC_RELEASE_2020_VERSION = "minio/mc:RELEASE.2020-12-10T01-26-17Z"
-MINIO_MC_RELEASE_2021_VERSION = "minio/mc:RELEASE.2021-03-23T05-46-11Z"
+MINIO_MC = "minio/mc:%s"
 OC_CI_ALPINE = "owncloudci/alpine:latest"
 OC_CI_BAZEL_BUILDIFIER = "owncloudci/bazel-buildifier"
 OC_CI_CORE_NODEJS = "owncloudci/core:nodejs14"
@@ -2455,7 +2454,7 @@ def cacheOcisPipeline(ctx):
 def getOcis():
     return [{
         "name": "get-ocis-from-cache",
-        "image": MINIO_MC_RELEASE_2020_VERSION,
+        "image": MINIO_MC % "RELEASE.2020-12-10T01-26-17Z",
         "failure": "ignore",
         "environment": {
             "MC_HOST": {
@@ -2536,7 +2535,7 @@ def cacheOcis():
 def listRemoteCache():
     return [{
         "name": "list-ocis-bin-cache",
-        "image": MINIO_MC_RELEASE_2020_VERSION,
+        "image": MINIO_MC % "RELEASE.2020-12-10T01-26-17Z",
         "failure": "ignore",
         "environment": {
             "MC_HOST": {
@@ -3101,7 +3100,7 @@ def genericCachePurge(ctx, name, cache_key):
         "steps": [
             {
                 "name": "purge-cache",
-                "image": MINIO_MC_RELEASE_2021_VERSION,
+                "image": MINIO_MC % "RELEASE.2021-03-23T05-46-11Z",
                 "failure": "ignore",
                 "environment": {
                     "MC_HOST_cache": {
