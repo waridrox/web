@@ -1,19 +1,107 @@
-[![Rocket chat](https://img.shields.io/badge/Chat%20on%20Rocket.Chat-blue?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABhGlDQ1BJQ0MgcHJvZmlsZQAAKJF9kT1Iw0AcxV9TpSItDnaQIpKhOlkQFemoVShChVArtOpgcv2EJg1Jiouj4Fpw8GOx6uDirKuDqyAIfoA4OTopukiJ/0sKLWI8OO7Hu3uPu3eA0Kwy1eyZAFTNMtLJhJjNrYqBVwQxghDiiMjM1OckKQXP8XUPH1/vYjzL+9yfI5QvmAzwicSzTDcs4g3imU1L57xPHGZlOU98Tjxu0AWJH7muuPzGueSwwDPDRiY9TxwmFktdrHQxKxsq8TRxNK9qlC9kXc5z3uKsVuusfU/+wmBBW1nmOs1hJLGIJUgQoaCOCqqwEKNVI8VEmvYTHv6I45fIpZCrAkaOBdSgQnb84H/wu1uzODXpJgUTQO+LbX+MAoFdoNWw7e9j226dAP5n4Err+GtNIP5JeqOjRY+AgW3g4rqjKXvA5Q4w9KTLhuxIfppCsQi8n9E35YDBW6B/ze2tvY/TByBDXaVugINDYKxE2ese7+7r7u3fM+3+fgDAvHLGj7r9AwAAAAlwSFlzAAALEwAACxMBAJqcGAAAAAd0SU1FB+QMHg05Mvq8cfAAAAAGYktHRAD/AP8A/6C9p5MAAAcbSURBVGje7VlpTFRXGLU0NmmNpuma9IciCCKCQDTuxqQWkrrTNJAal6Y2ECyoURONRBPXuBujVpsYiys1qUH7w8QVjQnVP9Zqq3Y2FgcQmIEBBpgZmPl6vvveLG94D2ZAFhNvcsIwb5nv3G87994hQ970oY+OjgaygR3AWmAyMPRNIjAV+A8gGQ3AKX1U1Nf60aNTgVn4nIDvPgLeGYwE3gd+ATwBJBhuQ2xshyEuzmWIiWnQRUY+0o0adRBkUvQxMRGDicAHwLkg4xUwTJtG5RkZVDZnDunHjKmCV3JB4r3BQyIq6jgM83RFQhCZNIlMqamkj41txzO/47tcYBWwApgHJAGfABH96YGxMMbMxnVHoAsweRdgBf4GfgW+A77AxPRt3ugjIzONycmO+qIiMqal9YxAVBThPYQcIYSX9H90dDvwFNjIRPqWQFKSo+3RI7Jev84xHjaBMuRHdX4+mVesoNJZs0gfFyeRkIiwd2qAQmA1sBhIAT4F3n0dIRSLH9LVbd9OzpqaHnvBMGMG6ZOSQrmXPVMve+cikANwme55UYDb1xri413VO3aQITm5N7nQ0/x5BXBR+Bb4sEdeQJ2vN0ycKNxuGDeuV3kggM96GbqA78V3UmipwQHcAzK4vIdTRvNQ16UyGhtLtbt2hRZKsnGGsWOpFL3iZXo6Va9aRbVbt5LlwAGyHj0qwJ9rt2yhqpwcqli8mExTp4pnfCQ7v7tVzpmEUGZ/GmD2GmReupScZjOV4ce0ZloYDS9VLFpEdbt3k/3GDXKZTORuaiLq6CCt4cE1vsdpNJIdBaNu506qWLBAvEun7hmWON902VdwMQoo8j5ku3CB2hsbqSw7W3XGjRMmUHVuLtlv3aKOhgbq1fB4qKO+XpBh7xgTE9U8wr0lq8uKhYs/i9hPSKCWBw+kchpYUXhmUF7Ny5ZRy7175HE66XUPj8NB9uJiMi9Z4v9NPwkb8H1IBCznz5ORNY/3YTQmnhnr4cO9n/EQBnvEsn+/sCWIRCUwW4vAJu+NprlzFTNvTEmhxkuXRPz21/C0t4tQNnIUKEkUs9ZSI/AlYFfczB6JjyfbuXMiVvt9uN3UcPo0GbxdXbKrA/hJjcAIoESRPAidmk2b+iTeQ/ZEWxu9Wr9e0ld+2x7w4kqNxInA2S+dPp0cz5/TQA/H06dkmjIl0AstQGqw8RFy4xA3cU1+tWGDcKNWorF7azZuJFtBQefkxnMt9++LhlaHpuh48qTTO9orK8l67JjwctPly+RubdXMh+o1a6Q+4fdCfjCB4bJrfDc1FhaqvxAhVbN5s9TQWBrgLxvqcbl897TcvUsmrC+88oFXcs4XL/z8bDaqWrnSJzGwdKX6Eyc0vWA7cyY4mQuMgesMfPEZ8MynLJE4bITacBoMZJo82R+X+MsywlVW5ruHPaMbOZICPVp/8qTvemtJiSgQXqP4esX8+Zpl2n7zpiAZQOAPxc6JrM3/DYUASwY2WEFg5kxyVVT4CcBDgQS4uzacOuUn8PAhGcaPVxKALHFDAagSgFTpjgCH0F+KELp4UTMmWf9A/EkhhBdb9u1TaCA2kEl5VSnrHSbuCyG7XcS1NwyZjO3s2V6FEC/EyxVJjPKlJczczc3UdOWKMLzp6lVhULDGaXv8mKxHjojQYfHWqRBYLGTDJHHXtd++rVmuRRKvXh2cxJsDjR8GHFfsC3EZRZg4nj0b+DKKCiZyTllGvwre2MqQ48qlaGRIRhZZA9rI1q0LbmQlWo1sKHBSISWg0zn+tPpBn0sJJL6KlMjpSpXGKfZJWcxhjcw9gWOx32YePYWTWkXM3QI+7m6FthxoVshpLGLsd+70i/Gc3JY9exRlVsZLYGYoS0wOpW3y9odUlVDqeD3Q1/HOqzxzZqbagoa3YZaGs0sxCigNJMD7Rq/fao+Y8eZr16gqK0taxHReUtYBP2BFGBEOgZEKAnip5dAhTZdz13bq9aKTdpUrfI11EN/LRtdu20bl8+aJRNVY1LO8WRiW8TKB2Yo8wHq4qaios/G1tVSdlycMYMnLcqAqO5tq8vPJsnevCDsGxzTLC57lioULJXmMDi6MVpbIwFrPW/7jerrduDewEvE+jlOnU2qi8nJhkG8PVGVjS4HQNrbagNtAOvennho/Pjh8uJV75TKHAYcMz7bG7IULt7xgL5Q3fkf09ripQNEHEhOlPSCrlVqKi8VCh3uDivFtgZWrC7jkxGTxeAb4Ue4/vTtYNEDdydvfjuBGVrl8OZWnpUkaXj0E/gQWyDOYB2wHDssa6xhwENgqn4bOBxLFoWG4ydnN7LMesmhtJWqEC8/mb3xUO9AHfXy+VR1m3D6X9/aHD4aTSj4xOQr8I/aHOh+5eoVUrVwl1nCzG2znxbwz8bncA7JkOcGxu0/eucuUY3fYkLfj7Xg7Bs34HwoINZEQp4aVAAAAAElFTkSuQmCC)](https://talk.owncloud.com/channel/web)
-[![Build Status](https://drone.owncloud.com/api/badges/owncloud/web/status.svg)](https://drone.owncloud.com/owncloud/web)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=owncloud_web&metric=security_rating)](https://sonarcloud.io/dashboard?id=owncloud_web)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=owncloud_web&metric=coverage)](https://sonarcloud.io/dashboard?id=owncloud_web)
-[![web docker image](https://img.shields.io/docker/v/owncloud/web?label=web%20docker%20image&logo=docker&sort=semver)](https://hub.docker.com/r/owncloud/web)
+## GSoC Task Evaluation Test for [project](https://hepsoftwarefoundation.org/gsoc/2022/proposal_CERNBOXimageExplorer.html) referencing [task](https://github.com/elizavetaRa/GSoC-Evaluation-Test)
 
-# ownCloud Web
-**User interface for ownCloud**
+_Contact_:
+* Name: Mohammad Warid
+* Email: mohdwarid4@gmail.com
+* Github: https://github.com/waridrox
 
-![image](https://raw.githubusercontent.com/owncloud/screenshots/master/web/oc_web.png)
+___
+To get started 
+```bash
+git clone -b task https://github.com/waridrox/web.git
+```
+`Commit Hash: bd0078be`
 
-ownCloud Web is a single page, standalone frontend based on modern web technologies. It brings new features as well as improved user flows and can be deployed independent of the backend server. As the successor to the classic ownCloud frontend, it is compatible with both the classic [ownCloud Server](https://github.com/owncloud/core) and [ownCloud Infinite Scale](https://github.com/owncloud/ocis). When used with the classic ownCloud Server, ownCloud Web is made available to users via an additional item "New Design" in the application switcher. Similarly ownCloud Web comes with an item in the application switcher that allows users to switch back to the "Classic Design".
+### **Task 1: Install OCIS & local web**
+This task was pretty straightforward, but the application wasn't responding on https://localhost:9200 as directed in the [developer docs](https://owncloud.dev/clients/web/backend-ocis/). Instead, https://host.docker.internal:9200/ and some help from the community at https://talk.owncloud.com/channel/ocis did the trick.
 
-[See this online Demo](https://web.owncloud.com) (user: demo, password: demo)
+___
 
-## Documentation
+### **Task 2: Image filter**
+This task can branch into different variations: 
 
-Please refer to the [documentation](https://owncloud.dev/clients/web/getting-started/) for setting up, building and running Web.
+**CASE 1:** If we want to keep the shared folder intact after applying the image filter. [_Demo_ ](https://drive.google.com/file/d/1ysiNzkk7Cd0soOGvVkMkP4XUIpnH1le8/view?usp=sharing)
 
+_This is achieved by persisting the folders with the `isFolder` bool value or checking if the mime type of the file is of the `image` type_
+
+```javascript
+if (state.areImageFilesShown) {
+       files = files.filter(
+        (file) => file.isFolder || file.mimeType.startsWith('image/')
+      )
+    }
+```
+
+**CASE 2:** If we do not want to keep the shared folder intact. This could make more sense from the perspective of the project description (https://hepsoftwarefoundation.org/gsoc/2022/proposal_CERNBOXimageExplorer.html) wherein we just need to deal with different image formats. [_Demo_](https://drive.google.com/file/d/1IRjtACU8bsOTrxGfzLEv8Kx2Fy3nmvpM/view?usp=sharing)
+```javascript
+if (state.areImageFilesShown) {
+  files = files.filter((file) => file.mimeType !== undefined && file.mimeType.startsWith('image/'))
+}
+// OR
+if (state.areImageFilesShown) {
+      files = files.filter(
+        (file) =>
+          file.extension === 'jpg' ||
+          file.extension === 'JPG' ||
+          file.extension === 'ico' ||
+          file.extension === 'jpeg' ||
+          file.extension === 'png' ||
+          file.extension === 'gif' ||
+          file.extension === 'webp' ||
+          file.extension === 'svg' ||
+          file.extension === 'webp'
+      )
+    }
+// ANY ONE OF THE APPROACHES CAN BE USED
+```
+_Here the implementation from CASE 1 doesn't work since that also has folders which are of `mimeType = undefined`. Thus either we need to filter out the files which have `mimeType = undefined` first and then filter out those mimeTypes that are of the type `image/` from the new array of file objects, or we can check for the file types individually as above_
+
+___
+
+### **Task 3: Control the image filter from the interface**
+For this task, the most suitable approach could be to simply add a toggle switch like the one for displaying the hidden files. This way, the UI is not hindered with new buttons or approaches that the users are unaware of. However, if the image gallery application has to be implemented, a picture icon could be displayed if it detects any images present in the list of files. And when the user clicks on the image icon, the gallery functionality can take effect. 
+
+
+To filter the images on the toggle, we can add a new state variable in the vuex store, `areImageFilesShown` and set its default state to `false` initially. If the user clicks the toggle switch, the state of this variable changes to true, which triggers the images filter function.
+
+In `state.js` under `packages/web-app-files/src/store/state.js`:
+```javascript
+areImageFilesShown: false
+```
+
+Adding a toggle-switch component under `packages/web-app-files/src/components/AppBar/ViewOptions.vue` below the `hidden-files` option: 
+```javascript
+<oc-switch
+  v-model="imageFilesShownModel"
+  data-testid="files-switch-image-files"
+  :label="$gettext('Show image files')"
+/>
+```
+
+Then changing image files visibility under `packages/web-app-files/src/store/mutations.js` and persisting state to `localStorage`:
+```javascript
+SET_IMAGE_FILES_VISIBILITY(state, value) {
+    state.areImageFilesShown = value
+
+    window.localStorage.setItem('oc_imageFilesShown', value)
+}
+```
+
+
+___
+### **Task 4: Bonus**
+Since we are already making use of the state variables and altering the files array in Task 3 through one of the `getters` function, we have already achieved Task 4.
+
+___
+### **Task 5: Description**
+Coding decisions have been covered through Task explanations 1 to 4
+
+To keep the UX intact with the current implementation, I have placed the widget in the same place as the toggle switch for hidden files in the interface. It is recognisable since the toggle switch changes its colour in its active state, plus the files list is filtered only by images. To further increase the UX, one can add a notification message using the `OcNotificationMessage` ownCloud Design System component stating "Images filter applied!". 
+
+<img width="560" alt="Screenshot 2022-03-18 at 1 30 39 AM" src="https://user-images.githubusercontent.com/58583793/158987559-766df83e-5c19-49e9-be43-6095c8bb85d8.png">
+
+
+
+Another approach could be the inclusion of a new image gallery component that can flash once or twice if it detects that image files are present in the files list. When the user clicks the icon, the gallery application should fire up.
+
+Sample: <img width="1280" alt="sample" src="https://user-images.githubusercontent.com/58583793/158958242-d30302b8-c9ad-4c8e-8bdd-5aaddfe6b8b1.png">
