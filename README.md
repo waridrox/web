@@ -6,10 +6,22 @@ _Contact_:
 * Github: https://github.com/waridrox
 
 ___
-To get started 
+To get started - 
+Bash 1:
 ```bash
 git clone -b task https://github.com/waridrox/web.git
+cd web
+yarn && yarn build:w
 ```
+
+Bash 2:
+```bash
+cd web
+docker compose up ocis
+```
+
+Project can be accessed at `https://host.docker.internal:9200/`
+
 `Commit Hash: bd0078be`
 
 ### **Task 1: Install OCIS & local web**
