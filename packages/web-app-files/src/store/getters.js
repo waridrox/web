@@ -23,6 +23,10 @@ export default {
       files = files.filter((file) => !file.name.startsWith('.'))
     }
 
+    if (state.areImageFilesShown) {
+      files = files.filter((file) => file.mimeType !== undefined && file.mimeType.startsWith('image/'))
+    }
+
     return files
   },
   totalFilesSize: (state, getters) => {

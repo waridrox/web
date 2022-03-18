@@ -35,6 +35,11 @@
             data-testid="files-switch-hidden-files"
             :label="$gettext('Show hidden files')"
           />
+          <oc-switch
+            v-model="imageFilesShownModel"
+            data-testid="files-switch-image-files"
+            :label="$gettext('Show image files')"
+          />
         </li>
         <li class="files-view-options-list-item">
           <oc-page-size
@@ -67,7 +72,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('Files', ['areHiddenFilesShown']),
+    ...mapState('Files', ['areHiddenFilesShown', 'areImageFilesShown']),
     ...mapState('Files/sidebar', { sidebarClosed: 'closed' }),
 
     viewOptionsButtonLabel() {
@@ -91,10 +96,20 @@ export default {
       set(value) {
         this.SET_HIDDEN_FILES_VISIBILITY(value)
       }
+    },
+
+    imageFilesShownModel: {
+      get() {
+        return this.areImageFilesShown
+      },
+
+      set(value) {
+        this.SET_IMAGE_FILES_VISIBILITY(value)
+      }
     }
   },
   methods: {
-    ...mapMutations('Files', ['SET_HIDDEN_FILES_VISIBILITY']),
+    ...mapMutations('Files', ['SET_HIDDEN_FILES_VISIBILITY', 'SET_IMAGE_FILES_VISIBILITY']),
     ...mapActions('Files/sidebar', { toggleSidebar: 'toggle' })
   }
 }
